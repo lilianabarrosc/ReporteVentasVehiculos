@@ -6,13 +6,14 @@ using System.Web;
 using System.Configuration;
 using System.Data.Common;
 using System.Data;
+using Npgsql;
 
 namespace ReporteVentaVehiculos.Datos
 {
-    public class Auto
+    public class AutoDatos
     {
         //contructor de la clase
-        public Auto() 
+        public AutoDatos() 
         { }
 
         //conexion con la base de datos
@@ -66,7 +67,7 @@ namespace ReporteVentaVehiculos.Datos
         }
 
         //insertar auto
-        public static int insertAuto(string marca, string modelo, string tipocombustible, int anio)
+        public int insertAuto(string marca, string modelo, string tipocombustible, int anio)
         {
             List<DbParameter> parametros = new List<DbParameter>();
             //agregar los parametros
@@ -94,5 +95,50 @@ namespace ReporteVentaVehiculos.Datos
 
         }
 
+        //actualizar auto
+        public int actualizarAuto(int idauto, string marca, string modelo, string tipocombustible, int anio)
+        {
+            List<DbParameter> parametros = new List<DbParameter>();
+            //agregar los parametros
+            DbParameter paramID = dpf.CreateParameter();
+            paramID.Value = idauto;
+            paramID.ParameterName = "idauto";
+            parametros.Add(paramID);
+
+            DbParameter param = dpf.CreateParameter();
+            param.Value = marca;
+            param.ParameterName = "marca";
+            parametros.Add(param);
+
+            DbParameter param1 = dpf.CreateParameter();
+            param1.Value = modelo;
+            param1.ParameterName = "modelo";
+            parametros.Add(param1);
+
+            DbParameter param2 = dpf.CreateParameter();
+            param2.Value = tipocombustible;
+            param2.ParameterName = "tipocombustible";
+            parametros.Add(param2);
+
+            DbParameter param3 = dpf.CreateParameter();
+            param3.Value = anio;
+            param3.ParameterName = "anio";
+            parametros.Add(param3);
+
+            return ejecutanomQuery("actualizarAuto", parametros);//nombre del procedimiento y parametros
+        }
+
+        //eliminar un auto
+        public int eliminarAuto(int idauto)
+        {
+            List<DbParameter> parametros = new List<DbParameter>();
+            //agregar los parametros
+            DbParameter paramID = dpf.CreateParameter();
+            paramID.Value = idauto;
+            paramID.ParameterName = "idauto";
+            parametros.Add(paramID);
+
+            return ejecutanomQuery("eliminarAuto", parametros);//nombre del procedimiento y parametros
+        }
     }
 }
