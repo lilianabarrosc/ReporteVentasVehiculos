@@ -14,20 +14,6 @@ namespace ReporteVentaVehiculos.Negocio
         public NegocioAuto()
         {}
 
-        /// <summary>
-        /// Establece las propiedades del Auto dado un NpgsqlDataReader
-        /// </summary>
-        /// <param name="dr">El NpgsqlDataReader que contiene los datos del auto</param>
-        public Auto datosAuto(NpgsqlDataReader dr)
-        {
-            int ID = Convert.ToInt32(dr["idauto"]);
-            string Marca = dr["marca"].ToString();
-            string Modelo = dr["modelo"].ToString();
-            string TipoCombustible = dr["tipoCombustible"].ToString();
-            int Anio = Convert.ToInt32(dr["anio"]);
-
-            return (new Auto(ID, Marca, Modelo, TipoCombustible, Anio));
-        }
 
         //insertar
         public int addAuto(string marca, string modelo, string tipoCombustible, int anio)

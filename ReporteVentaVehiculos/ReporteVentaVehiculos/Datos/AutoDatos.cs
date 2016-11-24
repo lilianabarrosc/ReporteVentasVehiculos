@@ -173,8 +173,8 @@ namespace ReporteVentaVehiculos.Datos
             {
                 string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
 
-                var comando = new NpgsqlCommand() { CommandText = "auto_seleccionar", CommandType = CommandType.StoredProcedure };
-                comando.Parameters.Add(new NpgsqlParameter("inIdauto", NpgsqlDbType.Integer));
+                var comando = new NpgsqlCommand() { CommandText = "autoSeleccionar", CommandType = CommandType.StoredProcedure };
+                comando.Parameters.Add(new NpgsqlParameter("inID", NpgsqlDbType.Integer));
                 comando.Parameters[0].Value = id;
 
                 using (var conn = new NpgsqlConnection(connString))
@@ -213,7 +213,7 @@ namespace ReporteVentaVehiculos.Datos
             {
                 string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
 
-                var comando = new NpgsqlCommand() { CommandText = "auto_todos", CommandType = CommandType.StoredProcedure };
+                var comando = new NpgsqlCommand() { CommandText = "autoTodosPag", CommandType = CommandType.StoredProcedure };
                 comando.Parameters.Add(new NpgsqlParameter("inIndex", NpgsqlDbType.Integer));
                 comando.Parameters[0].Value = index;
                 comando.Parameters.Add(new NpgsqlParameter("inNext", NpgsqlDbType.Integer));
@@ -235,7 +235,137 @@ namespace ReporteVentaVehiculos.Datos
             }
             catch (Exception ex) { }
 
-            return aircrafts;
+            return autos;
+        }
+
+        /// <summary>
+        /// Crea un nuevo auto en la base de datos
+        /// </summary>
+        public void crearAuto(string marca, string modelo, string tipocombustible, int anio)
+        {
+            try
+            {
+                string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
+
+                var comando = new NpgsqlCommand() { CommandText = "insertAuto", CommandType = CommandType.StoredProcedure };
+                comando.Parameters.Add(new NpgsqlParameter("outID", NpgsqlDbType.Integer));
+                comando.Parameters[0].Direction = ParameterDirection.Output;
+                comando.Parameters[0].Value = 0;
+                comando.Parameters.Add(new NpgsqlParameter("inmarca", NpgsqlDbType.Text));
+                comando.Parameters[1].Value = marca;
+                comando.Parameters.Add(new NpgsqlParameter("inmodelo", NpgsqlDbType.Text));
+                comando.Parameters[2].Value = modelo;
+                comando.Parameters.Add(new NpgsqlParameter("intipocombustibe", NpgsqlDbType.Text));
+                comando.Parameters[3].Value = tipocombustible;
+                comando.Parameters.Add(new NpgsqlParameter("anio", NpgsqlDbType.Integer));
+                comando.Parameters[4].Value = anio;
+
+                using (var conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    comando.Connection = conn;
+                    NpgsqlDataReader ds = comando.ExecuteReader();
+
+                    //var ID = Convert.ToInt64(comando.Parameters[0].Value);
+
+                    conn.Close();
+                }
+            }
+            catch (Exception ex) { }
+        }
+
+        /// <summary>
+        /// Modifica un auto en la base de datos
+        /// </summary>
+        public void modificarAuto(int idauto, string marca, string modelo, string tipocombustible, int anio)
+        {
+            try
+            {
+                string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
+
+                var comando = new NpgsqlCommand() { CommandText = "actualizarAuto", CommandType = CommandType.StoredProcedure };
+                comando.Parameters.Add(new NpgsqlParameter("inID", NpgsqlDbType.Integer));
+                comando.Parameters[0].Value = idauto;
+                comando.Parameters.Add(new NpgsqlParameter("inmarca", NpgsqlDbType.Text));
+                comando.Parameters[1].Value = marca;
+                comando.Parameters.Add(new NpgsqlParameter("inmodelo", NpgsqlDbType.Text));
+                comando.Parameters[2].Value = modelo;
+                comando.Parameters.Add(new NpgsqlParameter("intipoCombustible", NpgsqlDbType.Text));
+                comando.Parameters[3].Value = tipocombustible;
+                comando.Parameters.Add(new NpgsqlParameter("inanio", NpgsqlDbType.Integer));
+                comando.Parameters[4].Value = anio;
+
+                using (var conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    comando.Connection = conn;
+                    NpgsqlDataReader ds = comando.ExecuteReader();
+                    conn.Close();
+                }
+            }
+            catch (Exception ex) { }
+        }
+
+        /// <summary>
+        /// Elimina un auto de la base de datos
+        /// </summary>
+        public string eliminarAuto(int ID)
+        {
+            try
+            {
+                string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
+
+                var comando = new NpgsqlCommand() { CommandText = "eliminarAuto", CommandType = CommandType.StoredProcedure };
+                comando.Parameters.Add(new NpgsqlParameter("inID", NpgsqlDbType.Integer));
+                comando.Parameters[0].Value = ID;
+
+                using (var conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    comando.Connection = conn;
+                    NpgsqlDataReader ds = comando.ExecuteReader();
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            return "Se ha eliminado de manera exitosa";
+        }
+
+        /// <summary>
+        /// Selecciona todos los autos
+        /// </summary>
+        /// <returns>La lista de autos</returns>
+        public  List<Auto> Todos()
+        {
+
+            var autos = new List<Auto>();
+
+            try
+            {
+                string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
+
+                var comando = new NpgsqlCommand() { CommandText = "autoTodos", CommandType = CommandType.StoredProcedure };
+
+                using (var conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    comando.Connection = conn;
+                    NpgsqlDataReader ds = comando.ExecuteReader();
+
+                    while (ds.Read())
+                    {
+                        var auto = this.datosAuto(ds);
+                        autos.Add(auto);
+                    }
+                    conn.Close();
+                }
+            }
+            catch (Exception ex) { }
+
+            return autos;
         }
 
         #endregion
