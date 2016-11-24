@@ -50,7 +50,7 @@
         </tr>
         <tr>
             <td>
-                <asp:GridView AutoGenerateColumns="true" runat="server" ID ="gridAuto"
+                <asp:GridView AutoGenerateColumns="true" runat="server" ID ="gridAuto" />
             </td>
         </tr>
     </table>

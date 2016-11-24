@@ -7,6 +7,9 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data;
 using Npgsql;
+using NpgsqlTypes;
+
+using ReporteVentaVehiculos.Entidades;
 
 namespace ReporteVentaVehiculos.Datos
 {
@@ -36,7 +39,7 @@ namespace ReporteVentaVehiculos.Datos
             }
         }
 
-        //ejecutar una query
+        //ejecutar una query caso mySQL
         public static int ejecutanomQuery(string storeProcedure, List<DbParameter> parametros)
         {
             int id = 0;
@@ -140,5 +143,101 @@ namespace ReporteVentaVehiculos.Datos
 
             return ejecutanomQuery("eliminarAuto", parametros);//nombre del procedimiento y parametros
         }
+
+        #region [Metodos Postgress]
+
+        /// <summary>
+        /// Establece las propiedades del Auto dado un NpgsqlDataReader
+        /// </summary>
+        /// <param name="dr">El NpgsqlDataReader que contiene los datos del auto</param>
+        public Auto datosAuto(NpgsqlDataReader dr)
+        {
+            int ID = Convert.ToInt32(dr["idauto"]);
+            string Marca = dr["marca"].ToString();
+            string Modelo = dr["modelo"].ToString();
+            string TipoCombustible = dr["tipoCombustible"].ToString();
+            int Anio = Convert.ToInt32(dr["anio"]);
+
+            return (new Auto(ID, Marca, Modelo, TipoCombustible, Anio));
+        }
+
+        /// <summary>
+        /// Selecciona un auto dado el id que se entrega como parametro 
+        /// </summary>
+        /// <param name="id">el id del auto a seleccionar</param>
+        /// <returns>True si el auto fue encontrado, false en caso contrario</returns>
+
+        public Auto seleccionarAuto(long id)
+        {
+            try
+            {
+                string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
+
+                var comando = new NpgsqlCommand() { CommandText = "auto_seleccionar", CommandType = CommandType.StoredProcedure };
+                comando.Parameters.Add(new NpgsqlParameter("inIdauto", NpgsqlDbType.Integer));
+                comando.Parameters[0].Value = id;
+
+                using (var conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    comando.Connection = conn;
+                    NpgsqlDataReader ds = comando.ExecuteReader();
+
+                    if (ds.Read())
+                    {
+                        Auto a = this.datosAuto(ds);
+                        conn.Close();
+                        return a;
+                    }
+                    return null;
+                }
+            }
+            catch (Exception ex) { }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Selecciona los autos dada la pagina y cantidad de resultados por pagina
+        /// </summary>
+        /// <param name="cantidadResultados">Cantidad de resultado por pagina</param>
+        /// <param name="pagina">Pagina que se necesita ver</param>
+        /// <returns>La lista de autos</returns>
+        public List<Auto> Todos(int cantidadResultados, int pagina)
+        {
+
+            var autos = new List<Auto>();
+            int index = cantidadResultados * (pagina - 1);
+
+            try
+            {
+                string connString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
+
+                var comando = new NpgsqlCommand() { CommandText = "auto_todos", CommandType = CommandType.StoredProcedure };
+                comando.Parameters.Add(new NpgsqlParameter("inIndex", NpgsqlDbType.Integer));
+                comando.Parameters[0].Value = index;
+                comando.Parameters.Add(new NpgsqlParameter("inNext", NpgsqlDbType.Integer));
+                comando.Parameters[1].Value = cantidadResultados;
+
+                using (var conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    comando.Connection = conn;
+                    NpgsqlDataReader ds = comando.ExecuteReader();
+
+                    while (ds.Read())
+                    {
+                        var auto = this.datosAuto(ds);
+                        autos.Add(auto);
+                    }
+                    conn.Close();
+                }
+            }
+            catch (Exception ex) { }
+
+            return aircrafts;
+        }
+
+        #endregion
     }
 }
