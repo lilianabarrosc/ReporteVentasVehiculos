@@ -39,6 +39,7 @@ namespace ReporteVentaVehiculos.Datos
             }
         }
 
+        #region [Metodos mySQL]
         //ejecutar una query caso mySQL
         public static int ejecutanomQuery(string storeProcedure, List<DbParameter> parametros)
         {
@@ -143,6 +144,8 @@ namespace ReporteVentaVehiculos.Datos
 
             return ejecutanomQuery("eliminarAuto", parametros);//nombre del procedimiento y parametros
         }
+
+        #endregion
 
         #region [Metodos Postgress]
 
@@ -257,7 +260,7 @@ namespace ReporteVentaVehiculos.Datos
                 comando.Parameters[2].Value = modelo;
                 comando.Parameters.Add(new NpgsqlParameter("intipocombustibe", NpgsqlDbType.Text));
                 comando.Parameters[3].Value = tipocombustible;
-                comando.Parameters.Add(new NpgsqlParameter("anio", NpgsqlDbType.Integer));
+                comando.Parameters.Add(new NpgsqlParameter("inanio", NpgsqlDbType.Integer));
                 comando.Parameters[4].Value = anio;
 
                 using (var conn = new NpgsqlConnection(connString))

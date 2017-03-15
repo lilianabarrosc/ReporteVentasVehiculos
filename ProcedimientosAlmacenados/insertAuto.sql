@@ -20,7 +20,7 @@ $BODY$ BEGIN
 		"marca",
 		"modelo",
 		"tipocombustibe",
-		"inanio"
+		"anio"
 	)
 	VALUES
 	(

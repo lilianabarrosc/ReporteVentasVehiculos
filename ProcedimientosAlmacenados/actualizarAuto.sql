@@ -5,6 +5,7 @@ DROP FUNCTION IF EXISTS actualizarAuto () $$
 -- =============================================
 
 CREATE OR REPLACE FUNCTION actualizarAuto (
+	IN inID integer,
 	IN inmarca character varying(50)[],
   	IN inmodelo character varying(50)[],
   	IN intipocombustibe character varying(50)[],
@@ -17,7 +18,7 @@ $BODY$ BEGIN
 	SET
 		"marca" = inmarca,
 		"modelo" = inmodelo,
-		"intipocombustibe" = intipocombustibe,
+		"tipocombustibe" = intipocombustibe,
 		"anio" = inanio
 	WHERE inID = "idauto";
 	
